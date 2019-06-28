@@ -3,7 +3,7 @@
 
 This Adobe IO Runtime service is a Node.js service allows you send profile from Adobe Campaign Standard to Microsoft Dynamics. The integration is workflow based and requires and Amazon S3 bucket. The response of the serverless function allows you to update the campaign profile with the leadId of the Dynamics entity.
 
-[youtube](https://youtu.be/1_5-ujQAxHs)
+You can find a oveview of this integration on [youtube](https://youtu.be/1_5-ujQAxHs)
 
 Invocation example:
 

@@ -47,4 +47,8 @@ serverless deploy
 
 ![Adobe Campaign Standard Workflow](196935732.zip)
 
+Adobe Campaign Standard Workflow
+
+![acs-workflow-dynamics-sync.png](acs-workflow-dynamics-sync.png)
+
 

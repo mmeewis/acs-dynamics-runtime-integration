@@ -45,7 +45,7 @@ Use the `serverless` command to deploy your service.
 serverless deploy
 ```
 
-![Adobe Campaign Standard Workflow](196935732.zip)
+Download [Adobe Campaign Standard Workflow](196935732.zip)
 
 Adobe Campaign Standard Workflow
 

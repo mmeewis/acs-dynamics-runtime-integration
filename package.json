@@ -1,0 +1,19 @@
+{
+  "name": "dynamics-api",
+  "version": "1.0.0",
+  "description": "Sample OpenWhisk NodeJS serverless framework service.",
+  "main": "handler.js",
+  "keywords": [
+    "serverless",
+    "openwhisk"
+  ],
+  "devDependencies": {
+    "serverless-openwhisk": ">=0.13.0"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.429.0",
+    "fs": "0.0.1-security",
+    "parted": "^0.1.1",
+    "string-to-stream": "^1.1.1"
+  }
+}

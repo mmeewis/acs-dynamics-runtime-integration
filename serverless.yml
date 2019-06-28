@@ -1,0 +1,67 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: dynamics-api # NOTE: update this with your service name
+
+# Remember to install project dependencies to register the provider plugin.
+# $ npm install
+provider:
+  name: openwhisk
+
+functions:
+  ioprocessS3Bucket:
+    handler: dynamics-api.processS3Bucket
+  ioconvertCSVToJson:
+    handler: dynamics-api.convertCSVToJson
+  iodynamicsAuthenticate:
+    handler: dynamics-api.dynamicsAuthenticate
+  iocreateDynamicsLeads:
+    handler: dynamics-api.createDynamicsLeads
+  ioconvertJsonToCSV:
+    handler: dynamics-api.convertJsonToCSV
+  iooutputCSV:
+    handler: dynamics-api.outputCSV
+  iogetLeadByCampaignCustomerId:
+    handler: dynamics-api.getLeadByCampaignCustomerId
+  iogetDynamicsResponse:
+    handler: dynamics-api.getDynamicsResponse
+  tranferLeadsFromACSToDynamics:
+    name: "dynamics-runtime-api/tranferLeadsFromACSToDynamics"
+    sequence:
+        - ioprocessS3Bucket
+        - ioconvertCSVToJson
+        - iodynamicsAuthenticate
+        - iocreateDynamicsLeads
+        - ioconvertJsonToCSV
+        - iooutputCSV
+    annotations:
+      web-export: true
+      # https://adobeioruntime.net/api/v1/web/mmeewis-ns/dynamics-runtime-api/tranferLeadsFromACSToDynamics.json?bucketName=acs-mmeewis&fileName=toDynamics.csv
+      # To get a CSV response and not a json add the .http extenstion to the function
+  getLeadByCampaignCustomerId:
+    name: "dynamics-runtime-api/getLeadByCampaignCustomerId"
+    sequence:
+        - iodynamicsAuthenticate
+        - iogetLeadByCampaignCustomerId
+        - iogetDynamicsResponse
+    annotations:
+      web-export: true
+      # https://adobeioruntime.net/api/v1/web/mmeewis-ns/dynamics-runtime-api/getLeadByCampaignCustomerId.json?campaignCustomerId=76506
+
+# extend the framework using plugins listed here:
+# https://github.com/serverless/plugins
+plugins:
+  - serverless-openwhisk
+  
+  
+# curl -F 'data=@/Users/mmeewis/Projects/adobe.io.runtime/serverless/dynamics-api/test-file.txt' https://adobeioruntime.net/api/v1/web/mmeewis-ns/dyn-api/fromACS

@@ -1,0 +1,200 @@
+<?xml version='1.0'?>
+<package author="Marc Meewis (mmeewis@adobe.com)" buildDate="2019-06-28 21:50:53.637Z"
+         buildNumber="10530" buildVersion="7.0" label="MY-Dynamics Integration" name="MS-DYNAMICS-INTEGRATION-PKG">
+  <entities schema="xtk:workflow">
+    <workflow advanced="0" background="xtk:backgrounds/neolane.png" builtIn="0" cusPrice="0"
+              cusPriceLevel="" errorLimit="0" exampleFileName="" exampleFileUrl=""
+              handleImportRejects="0" history="30" importStatus="0" inProcess="0"
+              isMaster="0" isTemplate="0" label="Dynamics Push" name="MSDYN-WF" onError="0"
+              production="0" resource="profile" schema="nms:recipient" simulation="false"
+              sourceId="0" thumbnail="/nl/img/thumbnails/defaultWorkflow.png" timezone="_inherit_"
+              type="0">
+      <activities>
+        <query collision="0" distinct="true" form="query" img="nms:activities/query.svg"
+               keepAllExtraData="false" label="New Profiles" mask="0" name="query1"
+               noAutoPk="false" noAutoPkFilter="false" onError="0" resource="profile"
+               runOnSimulation="true" schema="head:profile" timezone="_inherit_"
+               useSource="false" x="144" y="117">
+          <transitions>
+            <result enabled="true" name="result" target="fileExport1" x="0" y="0"/>
+            <noData enabled="false" label="No data" name="noData"/>
+          </transitions>
+          <where displayFilter="MS Dynamics Lead Id is empty" extendedSchema="" filterName=""
+                 forceHint="">
+            <condition boolOperator="AND" desc="" expr="@cusDynamicsLeadId = ''"
+                       internalId="543424696"/>
+          </where>
+        </query>
+        <fileExport collision="0" exportMode="0" file="toDynamics.csv" form="fileExport"
+                    img="xtk:activities/export.svg" isDateAddedToFilename="false"
+                    label="Prepare For Dynamics" mask="0" name="fileExport1" onError="0"
+                    runOnSimulation="true" timezone="_inherit_" x="278" y="110">
+          <transitions>
+            <done enabled="true" label="Ok" name="done" target="fileTransfer1" x="0"
+                  y="0"/>
+            <error enabled="false" label="Error" name="error"/>
+          </transitions>
+          <extraction>
+            <source batchSize="200" format="text" startPath="/" upload="true">
+              <select>
+                <node alias="_2019-03-26T21_56_52Z" analyze="false" expr="[target/@firstName]"
+                      label="firstname"/>
+                <node alias="_2019-03-26T21_57_01Z" analyze="false" expr="[target/@lastName]"
+                      label="lastname"/>
+                <node alias="_2019-03-26T21_57_13Z" analyze="false" expr="[target/@cusCrmid]"
+                      label="new_adobecampaigncustomerid"/>
+                <node alias="_2019-03-26T21_57_22Z" analyze="false" expr="[target/@email]"
+                      label="emailaddress1"/>
+                <node alias="_2019-03-28T11_10_17Z" analyze="false" expr="'Adobe Experience Platform'"
+                      label="subject"/>
+              </select>
+              <dataSourceConfig codepage="1252" colType="0" ignoreConfigCheck="false"
+                                textQualifier="none" timezone="_inherit_" useCR="false"
+                                useLF="false"/>
+              <dataSourceConfigDest codepage="1252" colType="0" ignoreConfigCheck="false"
+                                    textQualifier="none" timezone="_inherit_" useCR="false"
+                                    useLF="false"/>
+            </source>
+            <destination downloadDestFile="true" endRecord="0" progressLines="20"
+                         putUnmappedCols="true" startPath="/" startRecord="0" transactionLines="200">
+              <exportFormat allAsString="false" analyze="false" codepage="1252" delEscaping="duplicateDel"
+                            delimitor="delNone" format="text" lineEnd="0" saveTitle="true"
+                            separator="sepPointComma" timezone="_inherit_">
+                <dataFormat decimalCount="-1" hideTime="false" orderDate="ymd" sepDate="/"
+                            sepDateTime=" " sepNumber="." sepThousand="false" sepTime=":"
+                            showMs="false" showSec="true" yearShort="false"/>
+              </exportFormat>
+            </destination>
+          </extraction>
+        </fileExport>
+        <writer collision="0" form="writer" identificationType="key" img="nms:activities/writer.svg"
+                label="Update Profile with Dynamics Lead Id" mask="0" maxErrorCount="100"
+                name="writer1" noPreservation="true" onError="0" operationType="insertOrUpdate"
+                resource="profile" runOnSimulation="true" schema="head:profile" timezone="_inherit_"
+                transactionSize="10000" x="780" y="250">
+          <transitions>
+            <done enabled="false" name="done"/>
+            <remainder enabled="false" label="Rejects" name="remainder"/>
+          </transitions>
+          <primaryKeyNode _finalIndex="1" calcExpr="new_adobecampaigncustomerid"
+                          dstExpr="@cusCrmid" enabledOperation="all" id="1971257449"/>
+          <node _finalIndex="1" calcExpr="leadid" dstExpr="@cusDynamicsLeadId" enabledOperation="all"
+                id="532742327"/>
+        </writer>
+        <fileTransfer action="1" archiveFiles="true" collision="0" deleteFiles="true"
+                      extAccount-cs="acs-mmeewis (EXT2)" form="fileTransfer" img="nms:activities/ftp.svg"
+                      label="Store toDynamics on S3" listFiles="false" mask="0" maxFiles="100"
+                      maxSizeMo="50" name="fileTransfer1" onError="0" portAddress="-"
+                      protocol="4" retryCount="6" retryFrequency="10" runOnSimulation="true"
+                      timezone="_inherit_" useExtAccount="true" useIncomingFile="true"
+                      x="416" y="110">
+          <transitions>
+            <done enabled="true" label="Ok" name="done" target="fileTransfer2" x="0"
+                  y="0"/>
+            <error enabled="false" label="Error" name="error"/>
+            <fileExists enabled="false" label="File exists" name="fileExists"/>
+            <fileDoesNotExist enabled="false" label="File does not exist" name="fileDoesNotExist"/>
+            <noFile enabled="false" label="No file" name="noFile"/>
+          </transitions>
+          <extAccount _operation="none" name="EXT2"/>
+        </fileTransfer>
+        <fileTransfer action="0" archiveFiles="true" collision="0" deleteFiles="false"
+                      form="fileTransfer" img="nms:activities/ftp.svg" label="Invoke UI Runtime To Create Dynamics Leads"
+                      listFiles="false" mask="0" maxFiles="100" maxSizeMo="50" name="fileTransfer2"
+                      onError="0" portAddress="-" protocol="1" retryCount="6" retryFrequency="10"
+                      runOnSimulation="true" timezone="_inherit_" url="https://adobeioruntime.net/api/v1/web/mmeewis-ns/dynamics-runtime-api/tranferLeadsFromACSToDynamics.http?bucketName=acs-mmeewis&amp;fileName=toDynamics.csv"
+                      useExtAccount="false" useIncomingFile="true" x="523" y="258">
+          <transitions>
+            <done enabled="true" label="Ok" name="done" target="fileImport1" x="0"
+                  y="0"/>
+            <error enabled="false" label="Error" name="error"/>
+            <fileExists enabled="false" label="File exists" name="fileExists"/>
+            <fileDoesNotExist enabled="false" label="File does not exist" name="fileDoesNotExist"/>
+            <noFile enabled="false" label="No file" name="noFile"/>
+          </transitions>
+        </fileTransfer>
+        <fileImport collectLineNumber="true" collision="0" deleteFile="true" file="/home/neolane/nl7/var/marcmeewis_mkt_dev1/upload/f9afcd42b09c5c23609d08aa0ffeeb3336923d5f23e806316919b5026faa81d4.csv"
+                    fileName="dynamicsResponse2.csv" form="fileImport" img="nms:activities/fileImport.svg"
+                    importType="0" label="Get Dynamics Response" mask="0" maxErrorCount="100"
+                    name="fileImport1" onError="0" runOnSimulation="true" runOnce="true"
+                    timezone="_inherit_" x="658" y="250">
+          <transitions>
+            <result enabled="true" name="result" target="writer1" x="0" y="0"/>
+            <remainder enabled="false" isDateAddedToFilename="false" label="Complement"
+                       name="remainder"/>
+          </transitions>
+          <source format="text" upload="true">
+            <name>dynamicsResponse2.csv</name>
+            <dataSourceConfig codepage="1252" colType="0" commaIsSep="false" consecutiveDelimiters="false"
+                              firstLineIsTitle="true" ignoreConfigCheck="" ignoredLines="0"
+                              multiline="false" otherSep="" semiColumnIsSep="true"
+                              spaceIsSep="false" tabIsSep="false" textQualifier="doubleQuotes"
+                              timezone="" useCR="" useLF="">
+              <dataSourceColumn allowNullValues="0" colProcessing="0" dateFormat="dmy"
+                                dateSep="/" dateTimeSep=" " decimalSep="," example="phil.multi@multi.be"
+                                intFormat="other" keyIndex="-1" label="emailaddress1"
+                                name="emailaddress1" numFormat="other" rejectCol="warning"
+                                spaceXform="none" stringXform="none" thousandSep=" "
+                                timeSep=":" type="string" typeXform="string" width="255"/>
+              <dataSourceColumn allowNullValues="0" colProcessing="0" dateFormat="dmy"
+                                dateSep="/" dateTimeSep=" " decimalSep="," example="Philippe"
+                                intFormat="other" keyIndex="-1" label="firstname"
+                                name="firstname" numFormat="other" rejectCol="warning"
+                                spaceXform="none" stringXform="none" thousandSep=" "
+                                timeSep=":" type="string" typeXform="string" width="255"/>
+              <dataSourceColumn allowNullValues="0" colProcessing="0" dateFormat="dmy"
+                                dateSep="/" dateTimeSep=" " decimalSep="," example="Multi"
+                                intFormat="other" keyIndex="-1" label="lastname"
+                                name="lastname" numFormat="other" rejectCol="warning"
+                                spaceXform="none" stringXform="none" thousandSep=" "
+                                timeSep=":" type="string" typeXform="string" width="255"/>
+              <dataSourceColumn allowNullValues="0" colProcessing="0" dateFormat="dmy"
+                                dateSep="/" dateTimeSep=" " decimalSep="," example="c86e321a-4053-e911-a964-000d3ab3a4b6"
+                                intFormat="other" keyIndex="-1" label="leadid" name="leadid"
+                                numFormat="other" rejectCol="warning" spaceXform="none"
+                                stringXform="none" thousandSep=" " timeSep=":" type="string"
+                                typeXform="string" width="255"/>
+              <dataSourceColumn allowNullValues="0" colProcessing="0" dateFormat="dmy"
+                                dateSep="/" dateTimeSep=" " decimalSep="," example="76506"
+                                intFormat="other" keyIndex="-1" label="new_adobecampaigncustomerid"
+                                name="new_adobecampaigncustomerid" numFormat="other"
+                                rejectCol="warning" spaceXform="none" stringXform="none"
+                                thousandSep=" " timeSep=":" type="string" typeXform="string"
+                                width="255"/>
+              <dataSourceColumn allowNullValues="0" colProcessing="0" dateFormat="dmy"
+                                dateSep="/" dateTimeSep=" " decimalSep="," example="Adobe Experience Platform"
+                                intFormat="other" keyIndex="-1" label="subject" name="subject"
+                                numFormat="other" rejectCol="warning" spaceXform="none"
+                                stringXform="none" thousandSep=" " timeSep=":" type="string"
+                                typeXform="string" width="255"/>
+            </dataSourceConfig>
+          </source>
+          <sample>emailaddress1;firstname;lastname;leadid;new_adobecampaigncustomerid;subject
+phil.multi@multi.be;Philippe;Multi;c86e321a-4053-e911-a964-000d3ab3a4b6;76506;Adobe Experience Platform</sample>
+        </fileImport>
+      </activities>
+      <orgUnit _operation="none" name="all"/>
+      <geoUnit _operation="none" name="all"/>
+      <campaign _operation="none" name="MSDYN-CMP"/>
+    </workflow>
+  </entities>
+  <imageConfigPKG publicURLMask="http://marcmeewis-mkt-dev1-res.adobedemo.com/res/marcmeewis_mkt_dev1/"/>
+  <entities schema="xtk:packageDef">
+    <packageDef allowDefaultNames="0" archive="0" builtIn="0" genPackage="" geoUnit-id="1"
+                includeDefaultValues="1" includeInstallScript="0" includeSpec="1"
+                label="MY-Dynamics Integration" lastExportedContent="175505455" name="MS-DYNAMICS-INTEGRATION-PKG"
+                orgUnit-id="1" title="MY-Dynamics Integration (MS-DYNAMICS-INTEGRATION-PKG)"
+                type="0" vendor="">
+      <definition _finalIndex="1" apiVersion="head" automaticDefinition="false" id="190972015"
+                  lineCountMax="5000" resource="workflowBase" title="Workflow (workflowBase)">
+        <where displayFilter="Workflow (attributes) is equal to Dynamics Push" filterName=""
+               filteringResource="workflowBase">
+          <condition _finalIndex="1" boolOperator="AND" desc="" expr="[.] = $RestKey(@Ui4MKWA0trU5OFE7-yedW59OYC9qqZocdXhl2EOMkmCCkznEQcxC6CT458YmY4i_1J0WRoxksqXo6uW_BJNwQoiJn0w)"
+                     internalId="193200240"/>
+        </where>
+      </definition>
+      <execution buildDate="2019-06-28 21:45:26.054Z" fileName="175505455.zip" filePath="/home/neolane/nl7/var/marcmeewis_mkt_dev1/package/"
+                 fileSize="527" objectCount="0"/>
+    </packageDef>
+  </entities>
+</package>

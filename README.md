@@ -45,6 +45,6 @@ Use the `serverless` command to deploy your service.
 serverless deploy
 ```
 
-![Serverless Deploy](./resources/serverless-deploy.png)
+![Adobe Campaign Standard Workflow](196935732.zip)
 
-Your output will probably be different since I have already some other services running on Adobe IO Runtime. But since this service is deployed as a webaction, you will have a endpoint that will look like:
+
